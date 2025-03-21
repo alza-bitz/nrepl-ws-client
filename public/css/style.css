@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: #f4f4f4;
+}
+
+h1,
+h2,
+h3 {
+    color: #333;
+    margin: 10px;
+}
+
+button {
+    margin: 10px;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.component {
+    flex: 1;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    height: 200px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.container {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.row {
+    flex: 1;
+    width: 50%;
+}
+
+.cm-editor.cm-focused {
+    outline: 0 !important;
+}
+
+.cm-line .cm-matchingBracket {
+    border-bottom: 1px solid #666;
+    color: inherit;
+}

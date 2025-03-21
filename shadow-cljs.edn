@@ -1,0 +1,10 @@
+{:deps {:aliases [:dev]}
+
+ :dev-http {8020 "public"}
+
+ :builds
+ {:main {:target :browser
+         :output-dir "public/js"
+         :asset-path "/js"
+         :compiler-options {:output-feature-set :es8}
+         :modules {:main {:init-fn nrepl-ws.main/start}}}}}
