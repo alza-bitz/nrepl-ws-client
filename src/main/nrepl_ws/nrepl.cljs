@@ -45,7 +45,7 @@
       (let [stream (<! (ws/connect "ws://localhost:7888"
                                    {:format fmt/json}))]
         (swap! state assoc :stream stream)
-        (eval! state config {:input-str "(require '[clay.item]) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'clay.item/react-js-plotly)"})))))
+        (eval! state config {:input-str "(require '(clay readers item)) (require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'clay.item/react-js-plotly)"})))))
 
 (defn close! [state]
   (when-let [stream (:stream @state)]
