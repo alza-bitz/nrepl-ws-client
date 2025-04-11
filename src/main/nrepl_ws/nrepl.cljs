@@ -14,7 +14,7 @@
   (assoc eval-op :code code))
 
 (defn eval-message-clay [code]
-  (eval-message (gstring/format "(require '[scicloj.clay.v2.api :as clay]) (clay/make-hiccup {:single-form (quote %s)})" code)))
+  (eval-message (gstring/format "(require '(scicloj.clay.v2 api)) (scicloj.clay.v2.api/make-hiccup {:single-form (quote %s)})" code)))
 
 (defn eval! [state config {:keys [input-ref input-str]}]
   (go
@@ -25,10 +25,10 @@
       (if (>! (:out stream) (eval-message-fn input))
         (do
           (js/console.log "sent message")
-          (if-let [buf (<! (:in stream))]
+          (if-let [msgs (<! (:in stream))]
             (do
-              (js/console.log "received messages" (pr-str buf))
-              (let [val-msgs (filter #(or (:value %) (:err %)) buf)
+              (js/console.log "received messages" (pr-str msgs))
+              (let [val-msgs (filter #(or (:value %) (:err %)) msgs)
                     val-msg (last val-msgs)
                     error? (contains? val-msg :err)
                     output (get-in config [:modes (if error? :repl (:mode @state)) :output])]
