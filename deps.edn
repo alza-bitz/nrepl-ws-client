@@ -5,6 +5,7 @@
         org.clojure/core.async {:mvn/version "1.7.701"}
         reagent/reagent {:mvn/version "1.3.0"}
         haslett/haslett {:mvn/version "0.2.0"}
+        io.github.alza-bitz/nrepl-ws-server {:git/sha "ef06d8b27d3bf5568c2ef1f57640aa9ab52c3950"}
         io.github.nextjournal/clojure-mode {:git/sha "d32d56f9b900c1cfe2c501672562200b54a56194"}
         applied-science/js-interop {:mvn/version "0.3.3"}}
  
