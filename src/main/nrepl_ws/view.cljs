@@ -58,9 +58,8 @@
                                       editor (view/EditorView. #js {:state editor-state
                                                                     :parent node})]
                                   (reset! editor-view editor))))]
-    [:div.input-comp
-     {:ref editor-mount
-      :class "component"}]
+    [:div
+     {:ref editor-mount}]
     (finally
       (when @editor-view
         (.destroy @editor-view)))))
@@ -70,10 +69,10 @@
    {:on-click eval-fn}
    "Eval"])
 
-(defn mode-toggle-button [state mode-toggle-fn]
+(defn toggle-mode-button [toggle-mode-fn]
   [:button
-   {:on-click mode-toggle-fn}
-   (str "Switch to " (if (= (:mode @state) :repl) "Clay" "Repl"))])
+   {:on-click toggle-mode-fn}
+   "Switch Mode"])
 
 (defn output-comp [output]
   (r/with-let [editor-view (atom nil)
@@ -102,32 +101,52 @@
                                                                      :to (.-length (.-doc current-state))
                                                                      :insert new-value}})]
                                   (.dispatch @editor-view transaction)))))]
-    [:div.output-comp
-     {:ref editor-mount
-      :class "component"}]
+    [:div
+     {:ref editor-mount}]
     (finally
       ;; Remove the watch when component unmounts
       (remove-watch output :editor-updater)
       (when @editor-view
         (.destroy @editor-view)))))
 
-(defn view [state config eval-fn mode-toggle-fn]
+;; TODO docs
+;; eval-fn must be a fn of two args
+;; toggle-mode-fn must be a fn of zero args
+(defn view [state config eval-fn toggle-mode-fn]
   (let [input (r/atom "(+ 1 2 3)")
-        output (get-in config [:modes :repl :output])
+        repl-output (get-in config [:modes :repl :output])
         kindly-output (get-in config [:modes :kindly :output])]
     (fn []
-      [:div
-       [:h2 "nREPL Websocket Client"]
-       [:div {:class "container"}
-        [:div {:class "row"}
-         [:h3 "Repl"]
-         [input-comp input (fn [input-str]
-                             (eval-fn state config {:input-str input-str}))]
+      (let [current-mode (get (vec (keys (:modes config))) (:mode @state))]
+        [:div
+         [:h3 "nREPL Websocket Client"]
+         [:div {:style {:margin "10px"
+                        ;; :padding "10px"
+                        }}
+          "alt + enter: eval all; ctrl + enter: eval form at cursor; ctrl + shift + enter: eval enclosing form at cursor"]
+         [:div {:class "container"}
+          [:div {:class "row"}
+           [:h4 "Editor"]
+           [:div {:class "component"}
+            [input-comp input (fn [input-str]
+                                (eval-fn state config {:input-str input-str}))]]]
+          [:div {:class "row"}
+           [:h4 "Result"]
+           [:div
+            [:div {:class "component"
+                   :hidden (not= current-mode :repl)}
+             [output-comp repl-output]]
+            [:div {:class "component"
+                   :hidden (not= current-mode :kindly)}
+             @kindly-output]
+            [:div {:class "component"
+                   :style {:overflow "hidden"}
+                   :hidden (not= current-mode :iframe)}
+             [:iframe {:src "http://localhost:7890"
+                       :style {:border "none"
+                               :width "100%"
+                               :height "100%"}}]]]]]
          [:div
-          [button (fn [_] (eval-fn state config {:input-ref input}))]
-          [mode-toggle-button state mode-toggle-fn]]
-         [output-comp output]]
-        [:div {:class "row"}
-         [:h3 "Clay"]
-         [:div {:class "component"
-                :style {:height "490px"}} @kindly-output]]]])))
+          [button (fn [_] (eval-fn state config {:input-ref input}))] 
+          [toggle-mode-button toggle-mode-fn]
+          "current mode:" current-mode]]))))
