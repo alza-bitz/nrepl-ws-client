@@ -7,7 +7,8 @@
    [goog.string.format]
    [haslett.client :as ws]
    [haslett.format :as fmt]
-   [nrepl-ws.transducers :refer [partition-when]]))
+   [nrepl-ws.transducers :refer [partition-when]]
+   [nrepl-ws.modes :as modes]))
 
 (def eval-op {:op "eval"})
 
@@ -36,7 +37,7 @@
 (defn eval! 
   [state config input & {:keys [single-form? mode] 
                          :or {single-form? false 
-                              mode (get (vec (keys (:modes config))) (:mode @state))}}]
+                              mode (modes/current-mode state config)}}]
   (js/console.log "eval!" 
                   "single-form?" (pr-str single-form?) 
                   "mode" (pr-str mode))
@@ -55,7 +56,7 @@
                     error? (contains? val-msg :err)
                     output-mode (cond error? :repl
                                       ;;  TODO change condition to "output or output-fn missing?"
-                                      (= :iframe mode) :repl
+                                      (= :clay mode) :repl
                                       :else mode)
                     {:keys [output output-fn]} (get-in config [:modes output-mode])]
                 (when (and output output-fn)

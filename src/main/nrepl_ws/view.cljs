@@ -1,12 +1,13 @@
 (ns nrepl-ws.view
   (:require
-   [applied-science.js-interop :as j]
-   [nextjournal.clojure-mode :as cm-clj]
-   [nextjournal.clojure-mode.extensions.eval-region :as eval-region]
    ["@codemirror/commands" :as commands]
    ["@codemirror/language" :as language]
    ["@codemirror/state" :as state]
    ["@codemirror/view" :as view]
+   [applied-science.js-interop :as j]
+   [nextjournal.clojure-mode :as cm-clj]
+   [nextjournal.clojure-mode.extensions.eval-region :as eval-region]
+   [nrepl-ws.modes :as modes]
    [reagent.core :as r]))
 
 (j/defn eval-at-cursor [eval-fn ^:js {:keys [state]}]
@@ -115,9 +116,9 @@
 (defn view [state config eval-fn toggle-mode-fn]
   (let [input (r/atom "(+ 1 2 3)")
         repl-output (get-in config [:modes :repl :output])
-        kindly-output (get-in config [:modes :kindly :output])]
+        clay-hiccup-output (get-in config [:modes :clay-hiccup :output])]
     (fn []
-      (let [current-mode (get (vec (keys (:modes config))) (:mode @state))]
+      (let [mode (modes/current-mode state config)]
         [:div
          [:h3 "nREPL Websocket Client"]
          [:div {:style {:margin "10px"}}
@@ -131,14 +132,14 @@
            [:h4 "Result"]
            [:div
             [:div {:class "component"
-                   :hidden (not= current-mode :repl)}
+                   :hidden (not= mode :repl)}
              [output-comp repl-output]]
             [:div {:class "component"
-                   :hidden (not= current-mode :kindly)}
-             @kindly-output]
+                   :hidden (not= mode :clay-hiccup)}
+             @clay-hiccup-output]
             [:div {:class "component"
                    :style {:overflow "hidden"}
-                   :hidden (not= current-mode :iframe)}
+                   :hidden (not= mode :clay)}
              [:iframe {:src "http://localhost:7890"
                        :style {:border "none"
                                :width "100%"
@@ -146,4 +147,4 @@
          [:div
           [eval-button (fn [] (eval-fn state config @input))]
           [toggle-mode-button toggle-mode-fn]
-          "current mode:" current-mode]]))))
+          "current mode: " mode]]))))
