@@ -10,13 +10,13 @@
    [reagent.core :as r]))
 
 (j/defn eval-at-cursor [eval-fn ^:js {:keys [state]}]
-  (some->> (eval-region/cursor-node-string state)
-           eval-fn)
+  (some-> (eval-region/cursor-node-string state)
+          eval-fn {:single-form? true})
   true)
 
 (j/defn eval-top-level [eval-fn ^:js {:keys [state]}]
-  (some->> (eval-region/top-level-string state)
-           eval-fn)
+  (some-> (eval-region/top-level-string state)
+          eval-fn {:single-form? true})
   true)
 
 (j/defn eval-cell [eval-fn ^:js {:keys [state]}]
@@ -64,7 +64,7 @@
       (when @editor-view
         (.destroy @editor-view)))))
 
-(defn button [eval-fn]
+(defn eval-button [eval-fn]
   [:button
    {:on-click eval-fn}
    "Eval"])
@@ -110,7 +110,7 @@
         (.destroy @editor-view)))))
 
 ;; TODO docs
-;; eval-fn must be a fn of two args
+;; eval-fn must be a fn of four args: state, config, input, opts
 ;; toggle-mode-fn must be a fn of zero args
 (defn view [state config eval-fn toggle-mode-fn]
   (let [input (r/atom "(+ 1 2 3)")
@@ -120,16 +120,13 @@
       (let [current-mode (get (vec (keys (:modes config))) (:mode @state))]
         [:div
          [:h3 "nREPL Websocket Client"]
-         [:div {:style {:margin "10px"
-                        ;; :padding "10px"
-                        }}
-          "alt + enter: eval all; ctrl + enter: eval form at cursor; ctrl + shift + enter: eval enclosing form at cursor"]
+         [:div {:style {:margin "10px"}}
+          "[alt + enter]: eval all. [ctrl + enter]: eval form at cursor. [ctrl + shift + enter]: eval top-level form at cursor."]
          [:div {:class "container"}
           [:div {:class "row"}
            [:h4 "Editor"]
            [:div {:class "component"}
-            [input-comp input (fn [input-str]
-                                (eval-fn state config {:input-str input-str}))]]]
+            [input-comp input (partial eval-fn state config)]]]
           [:div {:class "row"}
            [:h4 "Result"]
            [:div
@@ -147,6 +144,6 @@
                                :width "100%"
                                :height "100%"}}]]]]]
          [:div
-          [button (fn [_] (eval-fn state config {:input-ref input}))] 
+          [eval-button (fn [] (eval-fn state config @input))]
           [toggle-mode-button toggle-mode-fn]
           "current mode:" current-mode]]))))

@@ -20,12 +20,10 @@
       react-fragment
       (vec (cons :div react-fragment)))))
 
-;; :plotly #'scicloj.clay.v2.item/plotly
-
 (def config
   ;; TODO docs
-  ;; eval-message-fn must be a fn of two args
-  ;; output-fn must be a fn of one arg
+  ;; eval-message-fn must be a fn of two args: input, single-form?
+  ;; output-fn must be a fn of one arg: eval-result
   {:modes {:repl {:eval-message-fn nrepl/eval-message
                   :toggle-eval-message "(require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'scicloj.clay.v2.item/plotly)"
                   :output-fn str
@@ -50,7 +48,7 @@
           new-mode (next-mode current-mode modes)
           {:keys [toggle-eval-message]} (get-in config [:modes (get modes new-mode)])]
       (when toggle-eval-message
-        (nrepl/eval! state config {:input-str toggle-eval-message} :repl))
+        (nrepl/eval! state config toggle-eval-message {:mode :repl}))
       ;; TODO don't swap if eval returned an error
       (js/console.log "Switching mode from" (pr-str (get modes current-mode)) "to" (pr-str (get modes new-mode))) 
       (swap! state assoc :mode new-mode))))
