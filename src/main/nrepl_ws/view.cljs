@@ -70,10 +70,10 @@
    {:on-click eval-fn}
    "Eval"])
 
-(defn toggle-mode-button [toggle-mode-fn]
+(defn cycle-mode-button [toggle-mode-fn]
   [:button
    {:on-click toggle-mode-fn}
-   "Switch Mode"])
+   "Cycle Mode"])
 
 (defn output-comp [output]
   (r/with-let [editor-view (atom nil)
@@ -112,8 +112,8 @@
 
 ;; TODO docs
 ;; eval-fn must be a fn of four args: state, config, input, opts
-;; toggle-mode-fn must be a fn of zero args
-(defn view [state config eval-fn toggle-mode-fn]
+;; cycle-mode-fn must be a fn of zero args
+(defn view [state config eval-fn cycle-mode-fn]
   (let [input (r/atom "(+ 1 2 3)")
         repl-output (get-in config [:modes :repl :output])
         clay-hiccup-output (get-in config [:modes :clay-hiccup :output])]
@@ -146,5 +146,5 @@
                                :height "100%"}}]]]]]
          [:div
           [eval-button (fn [] (eval-fn state config @input))]
-          [toggle-mode-button toggle-mode-fn]
+          [cycle-mode-button cycle-mode-fn]
           "current mode: " mode]]))))

@@ -25,16 +25,16 @@
   ;; TODO docs
   ;; eval-message-fn must be a fn of two args: input, single-form?
   ;; output-fn must be a fn of one arg: eval-result
-  {:modes {:repl {:eval-message-fn nrepl/eval-message
-                  :toggle-eval-message "(require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'scicloj.clay.v2.item/plotly)"
+  {:modes {:repl {:cycle-mode-eval-input "(require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'scicloj.clay.v2.item/plotly)"
+                  :eval-message-fn nrepl/eval-message
                   :output-fn str
                   :output (r/atom "")}
-           :clay-hiccup {:eval-message-fn nrepl/eval-message-clay-make-hiccup
-                    :toggle-eval-message "(require '(clay readers item)) (require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'clay.item/react-js-plotly)"
-                    :output-fn (comp fix-fragment (partial read-string {:readers {'nrepl-ws/plotly readers/plotly}}))
-                    :output (r/atom "")}
-           :clay {:eval-message-fn nrepl/eval-message-clay-make 
-                  :toggle-eval-message "(require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'scicloj.clay.v2.item/plotly)"}}})
+           :clay-hiccup {:cycle-mode-eval-input "(require '(clay readers item)) (require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'clay.item/react-js-plotly)"
+                         :eval-message-fn nrepl/eval-message-clay-make-hiccup
+                         :output-fn (comp fix-fragment (partial read-string {:readers {'nrepl-ws/plotly readers/plotly}}))
+                         :output (r/atom "")}
+           :clay {:cycle-mode-eval-input "(require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'scicloj.clay.v2.item/plotly)"
+                  :eval-message-fn nrepl/eval-message-clay-make}}})
 
 ;; Page unload handler
 (defn setup-unload-listener []
@@ -51,9 +51,9 @@
 ;; After hot reload - start app
 (defn ^:dev/after-load start []
   (js/console.log "Starting/restarting application")
-    ;; TODO load config and merge with state, assert at least one mode configured
+  ;; TODO load config and merge with state, assert at least one mode configured
   (swap! state assoc :mode-index 0)
   (setup-unload-listener)
   (nrepl/connect! state config)
-  (dom/render [view/view state config nrepl/eval! (modes/toggle-mode-fn state config nrepl/eval!)]
+  (dom/render [view/view state config nrepl/eval! (modes/cycle-mode-fn state config nrepl/eval!)]
               (.getElementById js/document "main")))
