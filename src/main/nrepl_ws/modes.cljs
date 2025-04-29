@@ -4,6 +4,10 @@
   [state config]
   (get (vec (keys (:modes config))) (:mode-index @state)))
 
+(defn default-mode
+  [config]
+  (first (vec (keys (:modes config)))))
+
 (defn next-mode-index
   [mode-index modes]
   (if (= mode-index (dec (count modes)))

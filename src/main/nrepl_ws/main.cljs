@@ -51,7 +51,8 @@
 ;; After hot reload - start app
 (defn ^:dev/after-load start []
   (js/console.log "Starting/restarting application")
-  ;; TODO load config and merge with state, assert at least one mode configured
+  ;; TODO load config, validate it and then merge with state
+  ;; validation rules: assert at least one mode configured, modes require eval-message-fn but output-fn, output are optional
   (swap! state assoc :mode-index 0)
   (setup-unload-listener)
   (nrepl/connect! state config)

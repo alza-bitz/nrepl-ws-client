@@ -42,23 +42,23 @@
                   "single-form?" (pr-str single-form?) 
                   "mode" (pr-str mode))
   (let [stream (:stream @state)
-        {:keys [eval-message-fn]} (get-in config [:modes mode])
+        {:keys [eval-message-fn output output-fn]} (get-in config [:modes mode])
         message (eval-message-fn input single-form?)]
     (go
       (if (>! (:out stream) message)
         (do
-          (js/console.log "sent message: " (pr-str message))
+          (js/console.log "sent message:" (pr-str message))
           (if-let [msgs (<! (:in stream))]
             (do
               (js/console.log "received messages" (pr-str msgs))
               (let [val-msgs (filter #(or (:value %) (:err %)) msgs)
                     val-msg (last val-msgs)
                     error? (contains? val-msg :err)
-                    output-mode (cond error? :repl
-                                      ;;  TODO change condition to "output or output-fn missing?"
-                                      (= :clay mode) :repl
+                    output-mode (cond error? (modes/default-mode config)
+                                      (or (not output) (not output-fn)) (modes/default-mode config)
                                       :else mode)
                     {:keys [output output-fn]} (get-in config [:modes output-mode])]
+                (js/console.log "using output mode:" (pr-str output-mode))
                 (when (and output output-fn)
                   (reset! output (if error? (output-fn (:err val-msg)) (output-fn (:value val-msg)))))))
             (js/console.log "in channel closed!")))

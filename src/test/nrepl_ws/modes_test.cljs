@@ -14,6 +14,12 @@
                           :other-mode {}}}]
       (is (= :other-mode (modes/current-mode state config))))))
 
+(deftest default-mode-test
+  (testing "default mode"
+    (let [config {:modes {:default-mode {}
+                          :other-mode {}}}]
+      (is (= :default-mode (modes/default-mode config))))))
+
 (deftest next-mode-test
   (testing "next mode"
     (let [modes [:mode-1 :mode-2 :mode-3]]
