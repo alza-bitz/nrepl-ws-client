@@ -7,4 +7,7 @@
          :output-dir "public/js"
          :asset-path "/js"
          :compiler-options {:output-feature-set :es8}
-         :modules {:main {:init-fn nrepl-ws.main/start}}}}}
+         :modules {:main {:init-fn nrepl-ws.main/start}}}
+  :test {:target :node-test
+         :output-to "out/node-tests.js"
+         :autorun true}}}

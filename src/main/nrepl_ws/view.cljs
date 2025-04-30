@@ -1,22 +1,23 @@
 (ns nrepl-ws.view
   (:require
-   [applied-science.js-interop :as j]
-   [nextjournal.clojure-mode :as cm-clj]
-   [nextjournal.clojure-mode.extensions.eval-region :as eval-region]
    ["@codemirror/commands" :as commands]
    ["@codemirror/language" :as language]
    ["@codemirror/state" :as state]
    ["@codemirror/view" :as view]
+   [applied-science.js-interop :as j]
+   [nextjournal.clojure-mode :as cm-clj]
+   [nextjournal.clojure-mode.extensions.eval-region :as eval-region]
+   [nrepl-ws.modes :as modes]
    [reagent.core :as r]))
 
 (j/defn eval-at-cursor [eval-fn ^:js {:keys [state]}]
-  (some->> (eval-region/cursor-node-string state)
-           eval-fn)
+  (some-> (eval-region/cursor-node-string state)
+          eval-fn {:single-form? true})
   true)
 
 (j/defn eval-top-level [eval-fn ^:js {:keys [state]}]
-  (some->> (eval-region/top-level-string state)
-           eval-fn)
+  (some-> (eval-region/top-level-string state)
+          eval-fn {:single-form? true})
   true)
 
 (j/defn eval-cell [eval-fn ^:js {:keys [state]}]
@@ -58,22 +59,21 @@
                                       editor (view/EditorView. #js {:state editor-state
                                                                     :parent node})]
                                   (reset! editor-view editor))))]
-    [:div.input-comp
-     {:ref editor-mount
-      :class "component"}]
+    [:div
+     {:ref editor-mount}]
     (finally
       (when @editor-view
         (.destroy @editor-view)))))
 
-(defn button [eval-fn]
+(defn eval-button [eval-fn]
   [:button
    {:on-click eval-fn}
    "Eval"])
 
-(defn mode-toggle-button [state mode-toggle-fn]
+(defn cycle-mode-button [toggle-mode-fn]
   [:button
-   {:on-click mode-toggle-fn}
-   (str "Switch to " (if (= (:mode @state) :repl) "Clay" "Repl"))])
+   {:on-click toggle-mode-fn}
+   "Cycle Mode"])
 
 (defn output-comp [output]
   (r/with-let [editor-view (atom nil)
@@ -102,32 +102,49 @@
                                                                      :to (.-length (.-doc current-state))
                                                                      :insert new-value}})]
                                   (.dispatch @editor-view transaction)))))]
-    [:div.output-comp
-     {:ref editor-mount
-      :class "component"}]
+    [:div
+     {:ref editor-mount}]
     (finally
       ;; Remove the watch when component unmounts
       (remove-watch output :editor-updater)
       (when @editor-view
         (.destroy @editor-view)))))
 
-(defn view [state config eval-fn mode-toggle-fn]
+;; TODO docs
+;; eval-fn must be a fn of four args: state, config, input, opts
+;; cycle-mode-fn must be a fn of zero args
+(defn view [state config eval-fn cycle-mode-fn]
   (let [input (r/atom "(+ 1 2 3)")
-        output (get-in config [:modes :repl :output])
-        kindly-output (get-in config [:modes :kindly :output])]
+        repl-output (get-in config [:modes :repl :output])
+        clay-hiccup-output (get-in config [:modes :clay-hiccup :output])]
     (fn []
-      [:div
-       [:h2 "nREPL Websocket Client"]
-       [:div {:class "container"}
-        [:div {:class "row"}
-         [:h3 "Repl"]
-         [input-comp input (fn [input-str]
-                             (eval-fn state config {:input-str input-str}))]
+      (let [mode (modes/current-mode state config)]
+        [:div
+         [:h3 "nREPL Websocket Client"]
+         [:div {:style {:margin "10px"}}
+          "[alt + enter]: eval all. [ctrl + enter]: eval form at cursor. [ctrl + shift + enter]: eval top-level form at cursor."]
+         [:div {:class "container"}
+          [:div {:class "row"}
+           [:h4 "Editor"]
+           [:div {:class "component"}
+            [input-comp input (partial eval-fn state config)]]]
+          [:div {:class "row"}
+           [:h4 "Result"]
+           [:div
+            [:div {:class "component"
+                   :hidden (not= mode :repl)}
+             [output-comp repl-output]]
+            [:div {:class "component"
+                   :hidden (not= mode :clay-hiccup)}
+             @clay-hiccup-output]
+            [:div {:class "component"
+                   :style {:overflow "hidden"}
+                   :hidden (not= mode :clay)}
+             [:iframe {:src "http://localhost:7890"
+                       :style {:border "none"
+                               :width "100%"
+                               :height "100%"}}]]]]]
          [:div
-          [button (fn [_] (eval-fn state config {:input-ref input}))]
-          [mode-toggle-button state mode-toggle-fn]]
-         [output-comp output]]
-        [:div {:class "row"}
-         [:h3 "Clay"]
-         [:div {:class "component"
-                :style {:height "490px"}} @kindly-output]]]])))
+          [eval-button (fn [] (eval-fn state config @input))]
+          [cycle-mode-button cycle-mode-fn]
+          "current mode: " mode]]))))

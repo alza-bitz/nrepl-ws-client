@@ -3,6 +3,7 @@
    [clay.readers :as readers]
    [cljs.reader :refer [read-string]]
    [goog.events :refer [listen]]
+   [nrepl-ws.modes :as modes]
    [nrepl-ws.nrepl :as nrepl]
    [nrepl-ws.view :as view]
    [reagent.core :as r]
@@ -12,7 +13,7 @@
 
 ;; Use defonce to preserve state across hot reloads
 (def state (r/atom {:stream nil ;; should probably be a promise
-                    :mode :repl}))
+                    }))
 
 (defn fix-fragment [react-fragment]
   (when (vector? react-fragment)
@@ -21,19 +22,19 @@
       (vec (cons :div react-fragment)))))
 
 (def config
-  {:modes {:repl {:eval-message-fn nrepl/eval-message
+  ;; TODO docs
+  ;; eval-message-fn must be a fn of two args: input, single-form?
+  ;; output-fn must be a fn of one arg: eval-result
+  {:modes {:repl {:cycle-mode-eval-input "(require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'scicloj.clay.v2.item/plotly)"
+                  :eval-message-fn nrepl/eval-message
                   :output-fn str
                   :output (r/atom "")}
-           :kindly {:eval-message-fn nrepl/eval-message-clay
-                    :output-fn (comp fix-fragment (partial read-string {:readers {'nrepl-ws/plotly readers/plotly}}))
-                    :output (r/atom "")}}})
-
-(defn mode-toggle-fn [state]
-  (fn [] 
-    (let [current-mode (:mode @state)
-          new-mode (if (= current-mode :repl) :kindly :repl)]
-      (js/console.log "Switching mode from " (pr-str current-mode) " to " (pr-str new-mode))
-      (swap! state assoc :mode new-mode))))
+           :clay-hiccup {:cycle-mode-eval-input "(require '(clay readers item)) (require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'clay.item/react-js-plotly)"
+                         :eval-message-fn nrepl/eval-message-clay-make-hiccup
+                         :output-fn (comp fix-fragment (partial read-string {:readers {'nrepl-ws/plotly readers/plotly}}))
+                         :output (r/atom "")}
+           :clay {:cycle-mode-eval-input "(require '(scicloj.clay.v2 prepare)) (scicloj.clay.v2.prepare/add-preparer! :kind/plotly #'scicloj.clay.v2.item/plotly)"
+                  :eval-message-fn nrepl/eval-message-clay-make}}})
 
 ;; Page unload handler
 (defn setup-unload-listener []
@@ -50,7 +51,10 @@
 ;; After hot reload - start app
 (defn ^:dev/after-load start []
   (js/console.log "Starting/restarting application")
+  ;; TODO load config, validate it and then merge with state
+  ;; validation rules: assert at least one mode configured, modes require eval-message-fn but output-fn, output are optional
+  (swap! state assoc :mode-index 0)
   (setup-unload-listener)
   (nrepl/connect! state config)
-  (dom/render [view/view state config nrepl/eval! (mode-toggle-fn state)]
+  (dom/render [view/view state config nrepl/eval! (modes/cycle-mode-fn state config nrepl/eval!)]
               (.getElementById js/document "main")))
