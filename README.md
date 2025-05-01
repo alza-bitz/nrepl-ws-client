@@ -1,6 +1,6 @@
 # nREPL WebSocket Client
 
-A proof-of-concept for using a browser to write, load and evaluate Clojure code running on a [Websocket-connected nREPL server](), processing the results for display using the Scicloj notebook library [clay](https://scicloj.github.io/clay).
+A proof-of-concept for using a browser to write, load and evaluate Clojure code running on a [Websocket-connected nREPL server](https://github.com/alza-bitz/nrepl-ws-server), processing the results for display using the Scicloj notebook library [clay](https://scicloj.github.io/clay).
 
 ## Features
 
@@ -25,6 +25,8 @@ A proof-of-concept for using a browser to write, load and evaluate Clojure code 
 Alternatively, use an editor or environment that supports [dev containers](https://containers.dev). The supplied [devcontainer.json](.devcontainer/devcontainer.json) will install all the above prerequisites.
 
 ## Usage
+
+This project and the Websocket nREPL server are expected to be used in a "hosted" fashion with zero end-user setup required. However, the steps required for self-hosting are provided here for completeness.
 
 Clone the server repository :
 ```bash
@@ -54,7 +56,6 @@ Start the [shadow-cljs](https://github.com/thheller/shadow-cljs) server :
 ```bash
 clojure -M:shadow-cljs watch main
 ```
-Alternatively, use the built-in support for shadow-cljs provided by your editor.
 
 Finally, open your browser at [http://localhost:8020](http://localhost:8020)
 
