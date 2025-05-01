@@ -27,8 +27,5 @@
 			]
 		}
 	},
-	"postCreateCommand": "npm install && npm install -g shadow-cljs",
-	"mounts": [
-		"source=C:\\,target=/mnt/c,type=bind,consistency=cached"
-	]
+	"postCreateCommand": "npm install && npm install -g shadow-cljs"
 }
