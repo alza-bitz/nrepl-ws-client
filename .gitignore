@@ -147,3 +147,5 @@ dist
 # shadow-cljs
 .shadow-cljs/
 public/js/
+
+.actsecrets
