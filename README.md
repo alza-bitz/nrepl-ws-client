@@ -65,15 +65,29 @@ Finally, open your browser at [http://localhost:8020](http://localhost:8020)
 clojure -M:shadow-cljs watch main
 ```
 
-### Running the Tests
+### Running the tests
 ```
 clojure -M:shadow-cljs:test compile test
 ```
 
-### Build for Production
+### Build for production
 ```
 clojure -M:shadow-cljs release main`
 ```
+
+## Examples
+
+Client running the [noj getting started](https://scicloj.github.io/noj-v2-getting-started) tutorial in Clay mode :
+
+![alt text](<doc/Screenshot 2025-05-01 153442.png>)
+
+![alt text](<doc/Screenshot 2025-05-01 153640.png>)
+
+Client running the [noj getting started](https://scicloj.github.io/noj-v2-getting-started) tutorial in Clay Hiccup mode :
+
+![alt text](<doc/Screenshot 2025-05-01 153840.png>)
+
+![alt text](<doc/Screenshot 2025-05-01 153943.png>)
 
 ## License
 
