@@ -33,7 +33,7 @@ git clone https://github.com/alza-bitz/nrepl-ws-server.git
 ```
 
 Start the Websocket nREPL server in a separate terminal :
-```
+```bash
 cd /workspaces/nrepl-ws-server
 clojure -M:nrepl-ws
 ```
@@ -61,18 +61,18 @@ Finally, open your browser at [http://localhost:8020](http://localhost:8020)
 ## Development
 
 ### Start the shadow-cljs server
-```
+```bash
 clojure -M:shadow-cljs watch main
 ```
 
 ### Running the tests
-```
+```bash
 clojure -M:shadow-cljs:test compile test
 ```
 
 ### Build for production
-```
-clojure -M:shadow-cljs release main`
+```bash
+clojure -M:shadow-cljs release main
 ```
 
 ## Examples
