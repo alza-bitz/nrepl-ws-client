@@ -22,7 +22,7 @@ A proof-of-concept for using a browser to write, load and evaluate Clojure code 
 - [Clojure CLI tools](https://clojure.org/guides/install_clojure)
 - [nREPL server with WebSocket support](https://github.com/alza-bitz/nrepl-ws-server) running at `ws://localhost:7888`.
 
-Alternatively, use an editor or environment that supports dev containers. The supplied [devcontainer.json](.devcontainer/devcontainer.json) will install all the above prerequisites.
+Alternatively, use an editor or environment that supports [dev containers](https://containers.dev). The supplied [devcontainer.json](.devcontainer/devcontainer.json) will install all the above prerequisites.
 
 ## Usage
 
