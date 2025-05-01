@@ -52,7 +52,10 @@
 (defn ^:dev/after-load start []
   (js/console.log "Starting/restarting application")
   ;; TODO load config, validate it and then merge with state
-  ;; validation rules: assert at least one mode configured, modes require eval-message-fn but output-fn, output are optional
+  ;; config validation rules:
+  ;; at least one mode is provided (the default)
+  ;; mode required keys: eval-message-fn
+  ;; mode optional keys: cycle-mode-eval-input, output, output-fn (note: default mode requires keys output, output-fn)
   (swap! state assoc :mode-index 0)
   (setup-unload-listener)
   (nrepl/connect! state config)

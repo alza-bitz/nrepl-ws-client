@@ -54,7 +54,7 @@ Start the [shadow-cljs](https://github.com/thheller/shadow-cljs) server :
 ```bash
 clojure -M:shadow-cljs watch main
 ```
-Alternatively, use the built-in support for Shadow CLJS provided by your editor.
+Alternatively, use the built-in support for shadow-cljs provided by your editor.
 
 Finally, open your browser at [http://localhost:8020](http://localhost:8020)
 
