@@ -1,15 +1,15 @@
 # nREPL WebSocket Client
 
-A method for using a browser to write, load and evaluate Clojure code connected to a [remote nREPL server using websockets](), processing the results for display using the Scicloj notebook library [clay](https://scicloj.github.io/clay).
+A proof-of-concept for using a browser to write, load and evaluate Clojure code running on a [Websocket-connected nREPL server](), processing the results for display using the Scicloj notebook library [clay](https://scicloj.github.io/clay).
 
 ## Features
 
 - ClojureScript app using [Reagent](https://github.com/reagent-project/reagent)
 - Rich code editing with syntax highlighting courtesy of [CodeMirror](https://codemirror.net) and [clojure-mode](https://nextjournal.github.io/clojure-mode)
 - Multiple evaluation modes :
-  - REPL mode: Standard evaluation with text output
+  - REPL mode: Standard evaluation using text output
   - [Clay](https://scicloj.github.io/clay) mode: Notebook evaluation using indirect rendering inside an iframe
-  - [Clay Hiccup](https://scicloj.github.io/clay/#hiccup-output) mode: As above but using direct rendering of [Hiccup](https://github.com/weavejester/hiccup) data in the Reagent interface 
+  - [Clay Hiccup](https://scicloj.github.io/clay/#hiccup-output) mode: As above but using direct rendering of [Hiccup](https://github.com/weavejester/hiccup) data in the Reagent interface. Note: this mode is still experimental, but it does support tabular output from Tablecloth and Plotly charts from Tableplot.
 - Keyboard shortcuts for evaluation:
   - `Alt+Enter`: Evaluate editor content
   - `Ctrl+Enter`: Evaluate form at cursor
