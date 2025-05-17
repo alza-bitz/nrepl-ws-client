@@ -5,7 +5,7 @@ A proof-of-concept for using a browser to write, load and evaluate Clojure code 
 ## Features
 
 - ClojureScript app using [Reagent](https://github.com/reagent-project/reagent)
-- Rich code editing with syntax highlighting courtesy of [CodeMirror](https://codemirror.net) and [clojure-mode](https://nextjournal.github.io/clojure-mode)
+- Structural editing and syntax highlighting courtesy of [CodeMirror](https://codemirror.net) and [clojure-mode](https://nextjournal.github.io/clojure-mode)
 - Multiple evaluation modes :
   - REPL mode: Standard evaluation using text output
   - [Clay](https://scicloj.github.io/clay) mode: Notebook evaluation using indirect rendering inside an iframe
